@@ -24,14 +24,9 @@ export function AssetSearch() {
   const [cryptoResults, setCryptoResults] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'stock' | 'crypto'>('stock');
 
   const handleSearch = async (query: string, type: 'stock' | 'crypto') => {
-    if (!query.trim()) {
-      if (type === 'stock') setStockResults([]);
-      else setCryptoResults([]);
-      return;
-    }
-
     setLoading(true);
     try {
       if (type === 'stock') {
@@ -48,12 +43,26 @@ export function AssetSearch() {
     }
   };
 
+  const handleTabChange = (value: string) => {
+    setActiveTab(value as 'stock' | 'crypto');
+    setSearchQuery('');
+    setStockResults([]);
+    setCryptoResults([]);
+    // Show default results for the new tab
+    if (value === 'stock') {
+      handleSearch('', 'stock');
+    } else {
+      handleSearch('', 'crypto');
+    }
+  };
+
   const handleAddAsset = async (asset: Asset) => {
     try {
       let fullAsset: Asset;
       if (asset.type === 'stock') {
         fullAsset = await fetchStockPrice(asset.symbol);
       } else {
+        // fetchCryptoPrice handles both uppercase and lowercase
         fullAsset = await fetchCryptoPrice(asset.symbol);
       }
       addToWatchlist(fullAsset);
@@ -66,8 +75,18 @@ export function AssetSearch() {
     }
   };
 
+  // Load default results when dialog opens
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (isOpen) {
+      // Reset and load defaults
+      setSearchQuery('');
+      handleSearch('', activeTab);
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button>
           <Plus className="mr-2 h-4 w-4" />
@@ -81,7 +100,7 @@ export function AssetSearch() {
             Search for stocks or cryptocurrencies to add to your watchlist
           </DialogDescription>
         </DialogHeader>
-        <Tabs defaultValue="stock" className="w-full">
+        <Tabs defaultValue="stock" className="w-full" onValueChange={handleTabChange}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="stock">Stocks</TabsTrigger>
             <TabsTrigger value="crypto">Crypto</TabsTrigger>
@@ -103,6 +122,9 @@ export function AssetSearch() {
               {loading && <p className="text-sm text-muted-foreground">Searching...</p>}
               {!loading && stockResults.length === 0 && searchQuery && (
                 <p className="text-sm text-muted-foreground">No results found</p>
+              )}
+              {!loading && stockResults.length === 0 && !searchQuery && (
+                <p className="text-sm text-muted-foreground">Start typing to search, or browse popular stocks below</p>
               )}
               {stockResults.map((asset) => (
                 <div
@@ -144,6 +166,9 @@ export function AssetSearch() {
               {loading && <p className="text-sm text-muted-foreground">Searching...</p>}
               {!loading && cryptoResults.length === 0 && searchQuery && (
                 <p className="text-sm text-muted-foreground">No results found</p>
+              )}
+              {!loading && cryptoResults.length === 0 && !searchQuery && (
+                <p className="text-sm text-muted-foreground">Start typing to search, or browse popular cryptocurrencies below</p>
               )}
               {cryptoResults.map((asset) => (
                 <div

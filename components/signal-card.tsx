@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import type { AssetAnalysis } from '@/lib/types';
+import { useCurrency } from './currency-provider';
+import { formatPrice } from '@/lib/currency';
 
 interface SignalCardProps {
   analysis: AssetAnalysis;
@@ -12,6 +14,7 @@ interface SignalCardProps {
 
 export function SignalCard({ analysis }: SignalCardProps) {
   const { asset, signal } = analysis;
+  const { currency } = useCurrency();
   const isPositive = asset.changePercent24h >= 0;
   
   const getSignalColor = () => {
@@ -50,7 +53,7 @@ export function SignalCard({ analysis }: SignalCardProps) {
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <div className="text-2xl font-bold">${asset.price.toFixed(2)}</div>
+            <div className="text-2xl font-bold">{formatPrice(asset.price, currency)}</div>
             <div className={`text-sm ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
               {isPositive ? '+' : ''}{asset.changePercent24h.toFixed(2)}% (24h)
             </div>
@@ -81,13 +84,13 @@ export function SignalCard({ analysis }: SignalCardProps) {
             <div>
               <div className="text-xs text-muted-foreground mb-1">Bullish Target</div>
               <div className="text-lg font-semibold text-green-600">
-                ${signal.priceTarget.bullish.toFixed(2)}
+                {formatPrice(signal.priceTarget.bullish, currency)}
               </div>
             </div>
             <div>
               <div className="text-xs text-muted-foreground mb-1">Bearish Target</div>
               <div className="text-lg font-semibold text-red-600">
-                ${signal.priceTarget.bearish.toFixed(2)}
+                {formatPrice(signal.priceTarget.bearish, currency)}
               </div>
             </div>
           </div>
@@ -119,7 +122,7 @@ export function SignalCard({ analysis }: SignalCardProps) {
           </div>
           <div>
             <div className="text-muted-foreground">SMA 20</div>
-            <div className="font-medium">${signal.indicators.sma20.toFixed(2)}</div>
+            <div className="font-medium">{formatPrice(signal.indicators.sma20, currency)}</div>
           </div>
         </div>
       </CardContent>

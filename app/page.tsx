@@ -1,5 +1,6 @@
 import { AssetSearch } from '@/components/asset-search';
 import { Watchlist } from '@/components/watchlist';
+import { CurrencySwitcher } from '@/components/currency-switcher';
 
 export default function Home() {
   return (
@@ -13,7 +14,10 @@ export default function Home() {
                 Advanced market analysis with technical indicators and trading signals
               </p>
             </div>
-            <AssetSearch />
+            <div className="flex items-center gap-3">
+              <CurrencySwitcher />
+              <AssetSearch />
+            </div>
           </div>
         </div>
         
