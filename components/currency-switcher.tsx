@@ -8,7 +8,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useCurrency, type Currency } from './currency-provider';
+import { useCurrency } from './currency-provider';
+import type { Currency } from '@/lib/currency';
 
 export function CurrencySwitcher() {
   const { currency, setCurrency } = useCurrency();
